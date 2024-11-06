@@ -1,31 +1,32 @@
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Policy;
 using MemoryPack;
 using UnityEngine;
 
 namespace ExcellentGame
 {
-    [RequireComponent(typeof(SingleUseSignalPipe))]
+    [RequireComponent(typeof(SignalPipeWithSingleUse))]
     public class PersistentSingleUse : PersistentBehaviour<PersistentSingleUseData>
     {
-        private SingleUseSignalPipe _singleUsePipe;
+        private SignalPipeWithSingleUse _singleUsePipe;
 
         protected override void Awake()
         {
             base.Awake();
-            _singleUsePipe = GetComponent<SingleUseSignalPipe>();
+            _singleUsePipe = GetComponent<SignalPipeWithSingleUse>();
         }
 
         protected override void Apply(PersistentSingleUseData savedData)
         {
-            _singleUsePipe.HasBeenActivated = savedData.HasBeenActivated;
-            _singleUsePipe.HasBeenDeactivated = savedData.HasBeenDeactivated;
+            _singleUsePipe.UsedSignalTypes = new HashSet<SignalType>(savedData.UsedSignalTypes);
         }
 
         protected override PersistentSingleUseData Persist()
         {
             return new PersistentSingleUseData
             {
-                HasBeenActivated = _singleUsePipe.HasBeenActivated,
-                HasBeenDeactivated = _singleUsePipe.HasBeenDeactivated,
+                UsedSignalTypes = new HashSet<SignalType>(_singleUsePipe.UsedSignalTypes)
             };
         }
     }
@@ -33,7 +34,6 @@ namespace ExcellentGame
     [MemoryPackable]
     public readonly partial struct PersistentSingleUseData
     {
-        public bool HasBeenActivated { get; init; }
-        public bool HasBeenDeactivated { get; init; }
+        public readonly HashSet<SignalType> UsedSignalTypes { get; init; }
     }
 }
