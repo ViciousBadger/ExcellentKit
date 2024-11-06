@@ -1,7 +1,7 @@
 using MemoryPack;
 using UnityEngine;
 
-namespace ExcellentGame
+namespace ExcellentKit
 {
     /// <summary>
     /// Base class for a MonoBehaviour that can be "persisted" by storing data in a GameState.

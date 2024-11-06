@@ -1,7 +1,7 @@
 using MemoryPack;
 using UnityEngine;
 
-namespace ExcellentGame
+namespace ExcellentKit
 {
     public class PersistentActive : PersistentBehaviour<PersistentActiveData>
     {

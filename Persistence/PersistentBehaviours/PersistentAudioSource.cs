@@ -1,7 +1,7 @@
 using MemoryPack;
 using UnityEngine;
 
-namespace ExcellentGame
+namespace ExcellentKit
 {
     [RequireComponent(typeof(AudioSource))]
     public class PersistentAudioSource : PersistentBehaviour<PersistentAudioSourceData>

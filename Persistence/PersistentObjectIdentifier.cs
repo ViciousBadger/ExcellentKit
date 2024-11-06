@@ -3,7 +3,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-namespace ExcellentGame
+namespace ExcellentKit
 {
     public class PersistentObjectIdentifier : MonoBehaviour
     {

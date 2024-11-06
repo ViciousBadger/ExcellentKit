@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.InputSystem.EnhancedTouch;
 using UnityEngine.SceneManagement;
 
-namespace ExcellentGame
+namespace ExcellentKit
 {
     [MemoryPackable]
     public partial class PersistentGameState<TGlobalState>

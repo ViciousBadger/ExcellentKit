@@ -3,7 +3,7 @@ using MemoryPack;
 using UnityEngine;
 using UnityEngine.Splines;
 
-namespace ExcellentGame
+namespace ExcellentKit
 {
     [RequireComponent(typeof(SplineAnimate))]
     public class PersistentSplineAnimate : PersistentBehaviour<PersistentSplineAnimateData>

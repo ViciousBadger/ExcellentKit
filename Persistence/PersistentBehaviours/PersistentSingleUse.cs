@@ -1,10 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Policy;
+using ExcellentGame;
 using MemoryPack;
 using UnityEngine;
 
-namespace ExcellentGame
+namespace ExcellentKit
 {
     [RequireComponent(typeof(SignalPipeWithSingleUse))]
     public class PersistentSingleUse : PersistentBehaviour<PersistentSingleUseData>
