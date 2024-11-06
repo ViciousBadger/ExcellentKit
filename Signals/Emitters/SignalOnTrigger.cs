@@ -19,11 +19,11 @@ namespace ExcellentKit
     public class SignalOnTrigger : SignalEmitter
     {
         [BoxGroup("Per-collider delay"), HorizontalGroup("Per-collider delay/H"),]
-        [SerializeField, LabelText("On"), Suffix("Seconds")]
+        [SerializeField, LabelText("On")]
         private float _activationDelay = 0;
 
         [BoxGroup("Per-collider delay"), HorizontalGroup("Per-collider delay/H"),]
-        [SerializeField, LabelText("Off"), Suffix("Seconds")]
+        [SerializeField, LabelText("Off")]
         private float _deactivationDelay = 0;
 
         [SerializeField, BoxGroup("Filtering")]
