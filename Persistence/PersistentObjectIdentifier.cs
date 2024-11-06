@@ -1,20 +1,13 @@
 using System;
 using System.Linq;
-using Alchemy.Inspector;
-using JetBrains.Annotations;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace ExcellentGame
 {
     public class PersistentObjectIdentifier : MonoBehaviour
     {
         [SerializeField]
-        [ValidateInput(
-            "IdIsUnique",
-            "This ID is used by multiple objects in this scene. Things will go horribly wrong."
-        )]
         private string _idString = Guid.NewGuid().ToString();
 
         public string IdString => _idString;
@@ -24,36 +17,67 @@ namespace ExcellentGame
             return Hash128.Compute(_idString);
         }
 
-        [Button, UsedImplicitly]
-        private void SetToRandomGuid()
-        {
-            var serialized = new SerializedObject(this);
-            var idString = serialized.FindProperty("_idString");
-            idString.stringValue = Guid.NewGuid().ToString();
-            serialized.ApplyModifiedProperties();
-        }
-
-        [Button, UsedImplicitly]
-        private void SetToGameObjectName()
-        {
-            var serialized = new SerializedObject(this);
-            var idString = serialized.FindProperty("_idString");
-            idString.stringValue = gameObject.name;
-            serialized.ApplyModifiedProperties();
-        }
-
-        [UsedImplicitly]
-        private bool IdIsUnique(string id)
-        {
-            return FindObjectsByType<PersistentObjectIdentifier>(FindObjectsSortMode.None)
-                    .Count(obj => obj.IdString == id) <= 1;
-        }
-
         private void OnDrawGizmos()
         {
             GizmosExtra.ColorPaletteGameplay();
             GizmosExtra.DrawLabel(transform.position, string.Format("Persistent\n{0}", _idString));
-            //GizmosExtra.DrawIcon(transform.position + Vector3.down * 0.1f, "Saving.png");
+        }
+    }
+
+    [CustomEditor(typeof(PersistentObjectIdentifier))]
+    [CanEditMultipleObjects]
+    public class PersistentObjectIdentifierEditor : Editor
+    {
+        private SerializedProperty _idString;
+
+        void OnEnable()
+        {
+            _idString = serializedObject.FindProperty("_idString");
+        }
+
+        public override void OnInspectorGUI()
+        {
+            serializedObject.Update();
+            DrawDefaultInspector();
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button("Set to random GUID"))
+            {
+                foreach (var target in serializedObject.targetObjects)
+                {
+                    var serialized = new SerializedObject(target);
+                    serialized.FindProperty("_idString").stringValue = Guid.NewGuid().ToString();
+                    serialized.ApplyModifiedProperties();
+                }
+            }
+            if (GUILayout.Button("Set to GameObject name"))
+            {
+                foreach (var target in serializedObject.targetObjects)
+                {
+                    var serialized = new SerializedObject(target);
+                    serialized.FindProperty("_idString").stringValue = target.name;
+                    serialized.ApplyModifiedProperties();
+                }
+            }
+            GUILayout.EndHorizontal();
+
+            var count = GetIdCount();
+            var text = count > 1 ? "NOT unique" : "unique";
+
+            GUI.color = count > 1 ? Color.yellow : Color.green;
+            GUILayout.BeginHorizontal();
+            GUILayout.FlexibleSpace();
+            GUILayout.Label(string.Format("ID is {0} ({1} in scene)", text, count));
+            GUILayout.FlexibleSpace();
+            GUILayout.EndHorizontal();
+
+            serializedObject.ApplyModifiedProperties();
+        }
+
+        private int GetIdCount()
+        {
+            var idStringValue = _idString.stringValue;
+            return FindObjectsByType<PersistentObjectIdentifier>(FindObjectsSortMode.None)
+                .Count(obj => obj.IdString == idStringValue);
         }
     }
 }
