@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Text;
 using Alchemy.Inspector;
 using MemoryPack;
 using UnityEngine;
 
-namespace ExcellentGame
+namespace ExcellentKit
 {
     [MemoryPackable]
     public partial class DialogueState
@@ -35,6 +34,7 @@ namespace ExcellentGame
     [Flags]
     public enum DialogueFlag
     {
+        // TODO: Replace with simpler string flags BUT scramble them on save..
         None = 0b_0000_0000,
         Alpha = 0b_0000_0001,
         Beta = 0b_0000_0010,

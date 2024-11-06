@@ -1,8 +1,8 @@
 using UnityEngine;
 
-namespace ExcellentGame
+namespace ExcellentKit
 {
-    [CreateAssetMenu(menuName = "Excellent/Dialogue Character Profile")]
+    [CreateAssetMenu(menuName = "ExcellentKit/Dialogue Character Profile")]
     public class DialogueCharacterProfile : ScriptableObject
     {
         [SerializeField]

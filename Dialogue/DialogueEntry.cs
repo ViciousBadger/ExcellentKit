@@ -1,14 +1,10 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using Alchemy.Inspector;
-using ExcellentKit;
 using JetBrains.Annotations;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.UIElements;
 
-namespace ExcellentGame
+namespace ExcellentKit
 {
     public class DialogueEntry : MonoBehaviour
     {
@@ -46,7 +42,8 @@ namespace ExcellentGame
             }
         }
 
-        [Button, UsedImplicitly]
+        // TODO: add as inspector button
+        [UsedImplicitly]
         private void CreateNewChoice()
         {
             var newChoice = new GameObject("Choice");

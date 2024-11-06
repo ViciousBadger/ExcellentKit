@@ -1,14 +1,11 @@
 using System.Collections.Generic;
-using System.Linq;
-using Alchemy.Inspector;
-using ExcellentKit;
 using UnityEngine;
 
-namespace ExcellentGame
+namespace ExcellentKit
 {
     public class MarkedObject : MonoBehaviour
     {
-        [SerializeField, ListViewSettings(ShowFoldoutHeader = false)]
+        [SerializeField]
         private List<Marker> _markers;
 
         public List<Marker> Markers => _markers;

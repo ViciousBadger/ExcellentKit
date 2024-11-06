@@ -1,6 +1,6 @@
 using System;
 
-namespace ExcellentGame
+namespace ExcellentKit
 {
     public class DialogueProcess
     {

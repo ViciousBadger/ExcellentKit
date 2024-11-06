@@ -1,8 +1,7 @@
-using Alchemy.Inspector;
 using UnityEngine;
 
-namespace ExcellentGame
+namespace ExcellentKit
 {
-    [HideScriptField, CreateAssetMenu(menuName = "Excellent/Marker")]
+    [CreateAssetMenu(menuName = "ExcellentKit/Marker")]
     public class Marker : ScriptableObject { }
 }

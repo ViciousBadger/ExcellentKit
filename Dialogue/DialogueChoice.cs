@@ -1,13 +1,9 @@
-using System;
-using System.Collections.Generic;
 using System.Text;
-using Alchemy.Inspector;
-using ExcellentKit;
 using JetBrains.Annotations;
 using UnityEditor;
 using UnityEngine;
 
-namespace ExcellentGame
+namespace ExcellentKit
 {
     public class DialogueChoice : MonoBehaviour
     {
@@ -67,7 +63,8 @@ namespace ExcellentGame
             GizmosExtra.DrawLabel(transform.position, str.ToString());
         }
 
-        [Button, UsedImplicitly]
+        // TODO: add as inspector button
+        [UsedImplicitly]
         private void CreateNextEntry()
         {
             var newEntry = new GameObject("Entry");

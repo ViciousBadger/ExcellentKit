@@ -14,9 +14,9 @@ namespace ExcellentKit
             return Mathf.Clamp(value, min, max);
         }
 
-        public static bool HasMarker(this GameObject gameObject, ExcellentGame.Marker marker)
+        public static bool HasMarker(this GameObject gameObject, Marker marker)
         {
-            var markersComponent = gameObject.GetComponent<ExcellentGame.MarkedObject>();
+            var markersComponent = gameObject.GetComponent<MarkedObject>();
             return markersComponent ? markersComponent.HasMarker(marker) : false;
         }
     }

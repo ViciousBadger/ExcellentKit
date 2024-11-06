@@ -3,7 +3,6 @@ using UnityEngine;
 
 namespace ExcellentKit
 {
-    // TODO: Remove this.... just use unity events........ or something
     public class SignalToDialogueFlags : SignalBehaviour
     {
         [SerializeField]
