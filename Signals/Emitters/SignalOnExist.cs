@@ -24,5 +24,10 @@ namespace ExcellentKit
                 DeactivateTracked();
             }
         }
+
+        protected override string GetLabelTextForTarget(SignalReciever target)
+        {
+            return "On exist";
+        }
     }
 }

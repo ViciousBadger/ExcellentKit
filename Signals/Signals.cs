@@ -165,10 +165,7 @@ namespace ExcellentKit
             }
         }
 
-        protected virtual string? GetLabelTextForTarget(SignalReciever target)
-        {
-            return null;
-        }
+        protected abstract string GetLabelTextForTarget(SignalReciever target);
 
         [UsedImplicitly]
         private void OnDrawGizmos()

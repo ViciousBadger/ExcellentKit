@@ -4,12 +4,12 @@ using UnityEngine;
 namespace ExcellentKit
 {
     /// <summary>
-    /// Emits all recieved signals with an (optional) delay.
+    /// Emits all recieved signals with a configurable delay.
     /// </summary>
     public class SignalPipeWithDelay : SignalPipe
     {
         [SerializeField]
-        private float _delayInSeconds = 0;
+        private float _delay = 0;
 
         private sealed class Pulse
         {
@@ -47,12 +47,12 @@ namespace ExcellentKit
 
         protected override void OnSignalRecieved(Signal signal)
         {
-            _pulses.Add(new() { DelayTimer = _delayInSeconds, Signal = signal });
+            _pulses.Add(new() { DelayTimer = _delay, Signal = signal });
         }
 
         protected override string GetLabelTextForTarget(SignalReciever target)
         {
-            return string.Format("Delay ({0}s)", _delayInSeconds);
+            return string.Format("Delay ({0}s)", _delay);
         }
     }
 }

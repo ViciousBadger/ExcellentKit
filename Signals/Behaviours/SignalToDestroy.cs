@@ -7,9 +7,12 @@ namespace ExcellentKit
         [SerializeField]
         private GameObject _target;
 
+        [SerializeField]
+        private SignalType _destroyOn = SignalType.Activate;
+
         protected override void OnSignalRecieved(Signal signal)
         {
-            if (_target)
+            if (_target && signal.Type == _destroyOn)
             {
                 Destroy(_target);
             }

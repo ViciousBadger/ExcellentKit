@@ -5,16 +5,15 @@ namespace ExcellentKit
 {
     public class SignalToInstakill : SignalBehaviour
     {
+        [SerializeField]
+        private SignalType _killOn = SignalType.Activate;
+
         protected override void OnSignalRecieved(Signal signal)
         {
-            if (signal.Type == SignalType.Activate)
+            if (signal.IsPlayer(out PlayerActor player) && signal.Type == _killOn)
             {
-                if (signal.IsPlayer(out PlayerActor player))
-                {
-                    player.Mortality.Die();
-                }
+                player.Mortality.Die();
             }
-            // NOTE: Deactivation is ignored.. player is hopefully dead and gone by then.
         }
 
         private void OnDrawGizmos()

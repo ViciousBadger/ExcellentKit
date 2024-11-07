@@ -1,8 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Alchemy.Inspector;
-using ExcellentGame;
 using UnityEngine;
 
 namespace ExcellentKit
@@ -15,21 +13,18 @@ namespace ExcellentKit
     /// Very flexible - can be specialized to e.g. only react to the player or only activate for the first collider to enter and the last to leave.
     /// </para>
     /// </summary>
-
     public class SignalOnTrigger : SignalEmitter
     {
-        [BoxGroup("Per-collider delay"), HorizontalGroup("Per-collider delay/H"),]
-        [SerializeField, LabelText("On")]
+        [SerializeField]
         private float _activationDelay = 0;
 
-        [BoxGroup("Per-collider delay"), HorizontalGroup("Per-collider delay/H"),]
-        [SerializeField, LabelText("Off")]
+        [SerializeField]
         private float _deactivationDelay = 0;
 
-        [SerializeField, BoxGroup("Filtering")]
+        [SerializeField]
         private Marker _requiredMarker;
 
-        [SerializeField, BoxGroup("Filtering")]
+        [SerializeField]
         [Tooltip("Activate once first collider enters, deactivate once last collider leaves")]
         private bool _strictMultiMode;
 
