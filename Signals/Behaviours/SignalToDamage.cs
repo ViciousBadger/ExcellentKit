@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using ExcellentGame;
 using UnityEngine;
 
@@ -8,19 +9,26 @@ namespace ExcellentKit
         [SerializeField]
         DamageSource _source;
 
+        private readonly Dictionary<uint, PlayerActor> _activations = new();
+
         protected override void OnSignalRecieved(Signal signal)
         {
-            if (signal.IsPlayer(out PlayerActor player))
+            switch (signal)
             {
-                switch (signal.Type)
-                {
-                    case SignalType.Activate:
+                case ActivationSignal(uint id, SignalArgs args):
+                    if (args.SubjectIsPlayer(out PlayerActor player))
+                    {
+                        _activations.Add(id, player);
                         player.Mortality.AddDamageSource(_source);
-                        break;
-                    case SignalType.Deactivate:
-                        player.Mortality.RemoveDamageSource(_source);
-                        break;
-                }
+                    }
+                    break;
+                case DeactivationSignal(uint id):
+                    if (_activations.TryGetValue(id, out PlayerActor hurtingPlayer))
+                    {
+                        _activations.Remove(id);
+                        hurtingPlayer.Mortality.RemoveDamageSource(_source);
+                    }
+                    break;
             }
         }
 

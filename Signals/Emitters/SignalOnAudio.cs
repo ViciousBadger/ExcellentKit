@@ -22,7 +22,7 @@ namespace ExcellentKit
         {
             if (!_wasPlaying && _audioSource.isPlaying)
             {
-                ActivateTracked();
+                ActivateTracked(new SignalArgs());
                 _wasPlaying = true;
             }
             if (_wasPlaying && !_audioSource.isPlaying)

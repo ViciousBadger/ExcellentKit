@@ -12,7 +12,7 @@ namespace ExcellentKit
 
         protected override void OnSignalRecieved(Signal signal)
         {
-            if (_target && signal.Type == _destroyOn)
+            if (_target && signal.IsOfType(_destroyOn))
             {
                 Destroy(_target);
             }

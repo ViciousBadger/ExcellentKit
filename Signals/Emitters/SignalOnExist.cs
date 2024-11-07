@@ -10,7 +10,7 @@ namespace ExcellentKit
         [UsedImplicitly]
         private void Start()
         {
-            ActivateTracked();
+            ActivateTracked(new SignalArgs());
         }
 
         [UsedImplicitly]

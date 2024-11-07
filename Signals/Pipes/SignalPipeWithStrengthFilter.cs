@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace ExcellentKit
@@ -13,11 +14,29 @@ namespace ExcellentKit
         [SerializeField]
         private float _maxRequiredStrength;
 
+        private readonly HashSet<uint> _activeSignals = new();
+
         protected override void OnSignalRecieved(Signal signal)
         {
-            if (signal.Strength >= _minRequiredStrength && signal.Strength <= _maxRequiredStrength)
+            switch (signal)
             {
-                Emit(signal);
+                case ActivationSignal(uint id, SignalArgs args):
+                    if (
+                        args.Strength >= _minRequiredStrength
+                        && args.Strength <= _maxRequiredStrength
+                    )
+                    {
+                        _activeSignals.Add(id);
+                        Emit(signal);
+                    }
+                    break;
+                case DeactivationSignal(uint id):
+                    if (_activeSignals.Contains(id))
+                    {
+                        _activeSignals.Remove(id);
+                        Emit(signal);
+                    }
+                    break;
             }
         }
 

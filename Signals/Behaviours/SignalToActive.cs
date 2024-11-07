@@ -30,12 +30,12 @@ namespace ExcellentKit
 
         protected override void OnSignalRecieved(Signal signal)
         {
-            switch (signal.Type)
+            switch (signal)
             {
-                case SignalType.Activate:
+                case ActivationSignal:
                     Perform(_onActivate);
                     break;
-                case SignalType.Deactivate:
+                case DeactivationSignal:
                     Perform(_onDeactivate);
                     break;
             }

@@ -31,9 +31,9 @@ namespace ExcellentKit
 
         protected override void OnSignalRecieved(Signal signal)
         {
-            switch (signal.Type)
+            switch (signal)
             {
-                case SignalType.Activate:
+                case ActivationSignal:
                     if (_prefabToSpawn)
                     {
                         var instance = Instantiate(_prefabToSpawn, SpawnPosition, SpawnRotation);
@@ -45,7 +45,7 @@ namespace ExcellentKit
                         }
                     }
                     break;
-                case SignalType.Deactivate:
+                case DeactivationSignal:
                     if (_destroyOnSignalDeactivation)
                     {
                         DestroyAllSpawnedObjects();

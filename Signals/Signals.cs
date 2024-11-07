@@ -12,8 +12,8 @@ namespace ExcellentKit
 {
     public enum SignalType
     {
-        Activate = 0,
-        Deactivate = 1
+        Activate,
+        Deactivate
     }
 
     public static class SignalId
@@ -26,19 +26,29 @@ namespace ExcellentKit
         }
     }
 
-    public record Signal
+    public abstract record Signal(uint Id)
     {
-        /// <summary>
-        /// The "type" of the signal. Signals are always sent in pairs with
-        /// first one being an Activate and the second being a Deactivate.
-        /// </summary>
-        public SignalType Type { get; init; }
+        public abstract bool IsOfType(SignalType type);
+    };
 
-        /// <summary>
-        /// The ID of this signal. Activate/Deactivate pairs will have the same ID.
-        /// </summary>
-        public uint Id { get; init; }
+    public record ActivationSignal(uint Id, SignalArgs Args) : Signal(Id)
+    {
+        public override bool IsOfType(SignalType type)
+        {
+            return type == SignalType.Activate;
+        }
+    }
 
+    public record DeactivationSignal(uint Id) : Signal(Id)
+    {
+        public override bool IsOfType(SignalType type)
+        {
+            return type == SignalType.Deactivate;
+        }
+    }
+
+    public record SignalArgs
+    {
         /// <summary>
         /// An optional "subject" of the signal. Use cases include:
         /// <list type="bullet">
@@ -59,10 +69,7 @@ namespace ExcellentKit
         /// </summary>
         public string? Message { get; init; }
 
-        /// <summary>
-        /// Checks if the Subject of this signal is a player and if so returns that player.
-        /// </summary>
-        public bool IsPlayer(out PlayerActor? player)
+        public bool SubjectIsPlayer(out PlayerActor? player)
         {
             if (Subject != null)
             {
@@ -74,29 +81,7 @@ namespace ExcellentKit
                 return false;
             }
         }
-
-        public override string ToString()
-        {
-            var str = new StringBuilder();
-            str.AppendLine(string.Format("Type {0} ID {1}", Type, Id));
-            str.AppendLine(string.Format("Strength: {0}", Strength));
-            if (Subject != null)
-            {
-                str.AppendLine(string.Format("Subject: {0}", Subject.name));
-            }
-            if (Message != null)
-            {
-                str.AppendLine(string.Format("Message: {0}", Message));
-            }
-            return str.ToString();
-        }
     }
-
-    /// <summary>
-    /// An "Unity Event" handler that takes a signal as its only argument.
-    /// </summary>
-    [Serializable]
-    public class SignalUnityEvent : UnityEvent<Signal> { }
 
     /// <summary>
     /// A function that takes a signal as its only argument.
@@ -124,6 +109,8 @@ namespace ExcellentKit
             _reciever = GetComponent<SignalReciever>();
         }
 
+        // TODO: Consider if it's better to subscribe on awake and unsubscribe on destroy..
+        // Having signals stop on inactive gameobjects may cause issues w/ signals never being deactivated in weird cases..
         protected virtual void OnEnable()
         {
             if (_reciever != null)
@@ -215,14 +202,13 @@ namespace ExcellentKit
         /// <summary>
         /// Emit an Activate signal and track its ID.
         /// </summary>
-        /// <param name="template">Optional signal to copy extra properties from.</param>
-        public void ActivateTracked(Signal? template = null)
+        public void ActivateTracked(SignalArgs args)
         {
             if (_activeSignalId == null)
             {
                 var newId = SignalId.Next();
                 _activeSignalId = newId;
-                Emit((template ?? new Signal()) with { Id = newId, Type = SignalType.Activate });
+                Emit(new ActivationSignal(newId, args));
             }
             else
             {
@@ -235,18 +221,11 @@ namespace ExcellentKit
         /// <summary>
         /// Emit a Deactivate signal with the same ID as previous Activate signal.
         /// </summary>
-        /// <param name="template">Optional signal to copy extra properties from.</param>
-        public void DeactivateTracked(Signal? template = null)
+        public void DeactivateTracked()
         {
             if (_activeSignalId != null)
             {
-                Emit(
-                    (template ?? new Signal()) with
-                    {
-                        Id = (uint)_activeSignalId,
-                        Type = SignalType.Deactivate
-                    }
-                );
+                Emit(new DeactivationSignal((uint)_activeSignalId));
             }
             else
             {
@@ -268,29 +247,23 @@ namespace ExcellentKit
         /// Emit an Activate signal and track its ID and the supplied key.
         /// </summary>
         /// <param name="template">Optional signal to copy extra properties from.</param>
-        public void ActivateTracked(TKey key, Signal? template = null)
+        public void ActivateTracked(TKey key, SignalArgs args)
         {
             var newId = SignalId.Next();
             _activeSignals.Add(key, newId);
-            Emit((template ?? new Signal()) with { Type = SignalType.Activate, Id = newId, });
+            Emit(new ActivationSignal(newId, args));
         }
 
         /// <summary>
         /// Emit a Deactivate signal with the same ID as previous Activate signal using this key.
         /// </summary>
         /// <param name="template">Optional signal to copy extra properties from.</param>
-        public void DeactivateTracked(TKey key, Signal? template = null)
+        public void DeactivateTracked(TKey key)
         {
             if (_activeSignals.TryGetValue(key, out uint signalId))
             {
                 _activeSignals.Remove(key);
-                Emit(
-                    (template ?? new Signal()) with
-                    {
-                        Type = SignalType.Deactivate,
-                        Id = signalId,
-                    }
-                );
+                Emit(new DeactivationSignal(signalId));
             }
             else
             {

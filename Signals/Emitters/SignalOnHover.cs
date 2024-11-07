@@ -42,7 +42,7 @@ namespace ExcellentKit
 
         private void OnHoverEnd(HoverArgs args)
         {
-            DeactivateTracked(args.Actor, new() { Subject = args.Actor });
+            DeactivateTracked(args.Actor);
         }
 
         protected override string GetLabelTextForTarget(SignalReciever target)

@@ -18,21 +18,21 @@ namespace ExcellentKit
 
         protected override void OnSignalRecieved(Signal signal)
         {
-            switch (signal.Type)
+            switch (signal)
             {
-                case SignalType.Activate:
+                case ActivationSignal(uint id):
                     var roll = Random.Range(1, _sides + 1);
                     if (roll >= _minSuccessValue)
                     {
-                        _activeSignals.Add(signal.Id);
+                        _activeSignals.Add(id);
                         Emit(signal);
                     }
                     break;
-                case SignalType.Deactivate:
-                    if (_activeSignals.Contains(signal.Id))
+                case DeactivationSignal(uint id):
+                    if (_activeSignals.Contains(id))
                     {
                         // This is to make sure we only deactivate signals that "succeeded" the diceroll.
-                        _activeSignals.Remove(signal.Id);
+                        _activeSignals.Remove(id);
                         Emit(signal);
                     }
                     break;

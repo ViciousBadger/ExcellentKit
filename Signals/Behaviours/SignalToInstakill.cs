@@ -5,12 +5,12 @@ namespace ExcellentKit
 {
     public class SignalToInstakill : SignalBehaviour
     {
-        [SerializeField]
-        private SignalType _killOn = SignalType.Activate;
-
         protected override void OnSignalRecieved(Signal signal)
         {
-            if (signal.IsPlayer(out PlayerActor player) && signal.Type == _killOn)
+            if (
+                signal is ActivationSignal activationSignal
+                && activationSignal.Args.SubjectIsPlayer(out PlayerActor player)
+            )
             {
                 player.Mortality.Die();
             }

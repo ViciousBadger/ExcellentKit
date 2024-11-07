@@ -110,18 +110,18 @@ namespace ExcellentKit
 
         protected override void OnSignalRecieved(Signal signal)
         {
-            switch (signal.Type)
+            switch (signal)
             {
-                case SignalType.Activate:
-                    HandleActivate(signal);
+                case ActivationSignal(_, SignalArgs args):
+                    HandleActivate(args);
                     break;
-                case SignalType.Deactivate:
+                case DeactivationSignal:
                     HandleDeactivate();
                     break;
             }
         }
 
-        private void HandleActivate(Signal signal)
+        private void HandleActivate(SignalArgs args)
         {
             bool shouldPlay = _onActivate switch
             {
@@ -146,7 +146,7 @@ namespace ExcellentKit
 
             if (_adjustVolumeBySignalStrength.Enabled)
             {
-                _targetVolume = signal.Strength.Remap(
+                _targetVolume = args.Strength.Remap(
                     _adjustVolumeBySignalStrength.MinSignalStrength,
                     _adjustVolumeBySignalStrength.MaxSignalStrength,
                     _adjustVolumeBySignalStrength.MinSignalVolume,

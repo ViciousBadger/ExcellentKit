@@ -3,7 +3,7 @@ using UnityEngine;
 namespace ExcellentKit
 {
     /// <summary>
-    /// Emits recieved signals, but with an assigned strength
+    /// Emits recieved signals, but with an assigned strength.
     /// </summary>
     public class SignalPipeWithStrength : SignalPipe
     {
@@ -17,7 +17,19 @@ namespace ExcellentKit
 
         protected override void OnSignalRecieved(Signal signal)
         {
-            Emit(signal with { Strength = _strength });
+            if (signal is ActivationSignal activationSignal)
+            {
+                Emit(
+                    activationSignal with
+                    {
+                        Args = activationSignal.Args with { Strength = _strength }
+                    }
+                );
+            }
+            else
+            {
+                Emit(signal);
+            }
         }
     }
 }

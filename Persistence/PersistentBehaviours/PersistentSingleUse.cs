@@ -1,4 +1,7 @@
-using System.Collections.Generic;
+// NOTE: In case the signal is active WHILE it is persisted,
+// when it is applied again it will act as if it was also deactivated.
+// May solve this some day, but for now, dont do anything super important on deactivation of persistent signals..
+
 using MemoryPack;
 using UnityEngine;
 
@@ -17,21 +20,18 @@ namespace ExcellentKit
 
         protected override void Apply(PersistentSingleUseData savedData)
         {
-            _singleUsePipe.UsedSignalTypes = new HashSet<SignalType>(savedData.UsedSignalTypes);
+            _singleUsePipe.Used = savedData.Used;
         }
 
         protected override PersistentSingleUseData Persist()
         {
-            return new PersistentSingleUseData
-            {
-                UsedSignalTypes = new HashSet<SignalType>(_singleUsePipe.UsedSignalTypes)
-            };
+            return new PersistentSingleUseData { Used = _singleUsePipe.Used };
         }
     }
 
     [MemoryPackable]
     public readonly partial struct PersistentSingleUseData
     {
-        public readonly HashSet<SignalType> UsedSignalTypes { get; init; }
+        public readonly bool Used { get; init; }
     }
 }

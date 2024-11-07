@@ -10,7 +10,6 @@ namespace ExcellentKit
         /// <summary>
         /// Push a signal to all attached SignalBehaviours.
         /// </summary>
-        /// <param name="signal"></param>
         public void Push(Signal signal)
         {
             SignalRecieved?.Invoke(signal);

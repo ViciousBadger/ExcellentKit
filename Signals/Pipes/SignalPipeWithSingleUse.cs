@@ -3,18 +3,32 @@ using System.Collections.Generic;
 namespace ExcellentKit
 {
     /// <summary>
-    /// Emits all recieved messages, but only allow each signal type to be emitted once.
+    /// Only allows a single Activate signal to be emitted, followed by its Deactivate signal.
     /// </summary>
     public class SignalPipeWithSingleUse : SignalPipe
     {
-        public HashSet<SignalType> UsedSignalTypes { get; set; } = new();
+        public bool Used { get; set; } = new();
+
+        private uint? _activeSignalId = null;
 
         protected override void OnSignalRecieved(Signal signal)
         {
-            if (!UsedSignalTypes.Contains(signal.Type))
+            switch (signal)
             {
-                Emit(signal);
-                UsedSignalTypes.Add(signal.Type);
+                case ActivationSignal(uint id):
+                    if (!Used)
+                    {
+                        _activeSignalId = id;
+                        Used = true;
+                        Emit(signal);
+                    }
+                    break;
+                case DeactivationSignal(uint id):
+                    if (id == _activeSignalId)
+                    {
+                        Emit(signal);
+                    }
+                    break;
             }
         }
 

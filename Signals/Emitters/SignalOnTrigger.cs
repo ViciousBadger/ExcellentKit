@@ -24,16 +24,7 @@ namespace ExcellentKit
         [SerializeField]
         private Marker _requiredMarker;
 
-        [SerializeField]
-        [Tooltip("Activate once first collider enters, deactivate once last collider leaves")]
-        private bool _strictMultiMode;
-
         private readonly Dictionary<Collider, Overlap> _overlaps = new();
-
-        private int ActiveOverlapCount
-        {
-            get { return _overlaps.Values.Count(o => o.ActivatedSignalId != null); }
-        }
 
         class Overlap
         {
@@ -64,17 +55,12 @@ namespace ExcellentKit
                     var newId = SignalId.Next();
                     overlap.ActivatedSignalId = newId;
 
-                    if (!_strictMultiMode || ActiveOverlapCount == 1)
-                    {
-                        Emit(
-                            new()
-                            {
-                                Type = SignalType.Activate,
-                                Id = newId,
-                                Subject = pair.Key.gameObject,
-                            }
-                        );
-                    }
+                    Emit(
+                        new ActivationSignal(
+                            newId,
+                            new SignalArgs() { Subject = pair.Key.gameObject }
+                        )
+                    );
                 }
 
                 if (overlap.OverlapCount <= 0 && overlap.ActivatedSignalId == null)
@@ -89,17 +75,7 @@ namespace ExcellentKit
                     && overlap.DelayTimer <= 0
                 )
                 {
-                    if (!_strictMultiMode || ActiveOverlapCount == 1)
-                    {
-                        Emit(
-                            new()
-                            {
-                                Type = SignalType.Deactivate,
-                                Id = (uint)overlap.ActivatedSignalId,
-                                Subject = pair.Key.gameObject,
-                            }
-                        );
-                    }
+                    Emit(new DeactivationSignal((uint)overlap.ActivatedSignalId));
                     overlapsToRemove.Add(pair.Key);
                 }
             }
@@ -155,11 +131,6 @@ namespace ExcellentKit
             if (_activationDelay > 0f || _deactivationDelay > 0f)
             {
                 str.AppendLine(string.Format("{0}s / {1}s", _activationDelay, _deactivationDelay));
-            }
-
-            if (_strictMultiMode)
-            {
-                str.AppendLine("Strict multi mode");
             }
 
             // Remove last line break

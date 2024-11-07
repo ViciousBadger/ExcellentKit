@@ -19,7 +19,7 @@ namespace ExcellentKit
 
         private void OnCollisionExit(Collision collision)
         {
-            DeactivateTracked(collision.collider, new() { Strength = collision.impulse.magnitude });
+            DeactivateTracked(collision.collider);
         }
 
         protected override string GetLabelTextForTarget(SignalReciever target)

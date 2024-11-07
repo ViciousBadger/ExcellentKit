@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using LitMotion;
 using UnityEngine;
 
@@ -27,14 +28,14 @@ namespace ExcellentKit
                 _activeHandle.Cancel();
             }
 
-            switch (signal.Type)
+            switch (signal)
             {
-                case SignalType.Activate:
+                case ActivationSignal:
                     _activeHandle = LMotion
                         .Create(_originalColor, _targetColor, _changeTime)
                         .Bind(x => RenderSettings.ambientLight = x);
                     break;
-                case SignalType.Deactivate:
+                case DeactivationSignal:
                     _activeHandle = LMotion
                         .Create(_targetColor, _originalColor, _changeTime)
                         .Bind(x => RenderSettings.ambientLight = x);

@@ -126,14 +126,7 @@ namespace ExcellentGame
             if (target.TryGetComponent(out SignalReciever reciever))
             {
                 var newId = SignalId.Next();
-                reciever.Push(
-                    new()
-                    {
-                        Id = newId,
-                        Type = SignalType.Activate,
-                        Subject = gameObject
-                    }
-                );
+                reciever.Push(new ActivationSignal(newId, new() { Subject = gameObject }));
                 _activeSignals.Add(
                     type,
                     new ActiveDialogueSignal() { Id = newId, Reciever = reciever }
@@ -145,14 +138,7 @@ namespace ExcellentGame
         {
             if (_activeSignals.TryGetValue(type, out ActiveDialogueSignal activeDialogueSignal))
             {
-                activeDialogueSignal.Reciever.Push(
-                    new()
-                    {
-                        Id = activeDialogueSignal.Id,
-                        Type = SignalType.Deactivate,
-                        Subject = gameObject
-                    }
-                );
+                activeDialogueSignal.Reciever.Push(new DeactivationSignal(activeDialogueSignal.Id));
                 _activeSignals.Remove(type);
             }
         }

@@ -3,7 +3,7 @@ using UnityEngine;
 namespace ExcellentKit
 {
     /// <summary>
-    /// Emits recieved signals, but with an assigned message
+    /// Emits recieved signals, but with an assigned message.
     /// </summary>
     public class SignalPipeWithMessage : SignalPipe
     {
@@ -17,7 +17,19 @@ namespace ExcellentKit
 
         protected override void OnSignalRecieved(Signal signal)
         {
-            Emit(signal with { Message = _message });
+            if (signal is ActivationSignal activationSignal)
+            {
+                Emit(
+                    activationSignal with
+                    {
+                        Args = activationSignal.Args with { Message = _message }
+                    }
+                );
+            }
+            else
+            {
+                Emit(signal);
+            }
         }
     }
 }

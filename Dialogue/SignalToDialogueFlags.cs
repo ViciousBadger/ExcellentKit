@@ -16,17 +16,16 @@ namespace ExcellentKit
 
         protected override void OnSignalRecieved(Signal signal)
         {
-            if (signal.Type == SignalType.Activate)
+            if (signal is ActivationSignal activationSignal)
             {
                 var target = _targetCharacter
                     ? _targetCharacter
-                    : signal.Subject.GetComponent<DialogueCharacter>();
+                    : activationSignal.Args.Subject.GetComponent<DialogueCharacter>();
                 if (target)
                 {
                     target.State.ChangeFlags(_flags, _newState);
                 }
             }
-            // NOTE: we do nothing on deactivate, but in theory it could also have an effect..
         }
 
         private void OnDrawGizmos()

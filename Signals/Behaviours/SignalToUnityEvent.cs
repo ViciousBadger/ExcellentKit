@@ -1,24 +1,26 @@
+using System;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace ExcellentKit
 {
     public class SignalToUnityEvent : SignalBehaviour
     {
         [SerializeField]
-        private SignalUnityEvent _onActivate;
+        private UnityEvent<SignalArgs> _onActivate;
 
         [SerializeField]
-        private SignalUnityEvent _onDeactivate;
+        private UnityEvent _onDeactivate;
 
         protected override void OnSignalRecieved(Signal signal)
         {
-            switch (signal.Type)
+            switch (signal)
             {
-                case SignalType.Activate:
-                    _onActivate.Invoke(signal);
+                case ActivationSignal(_, SignalArgs args):
+                    _onActivate.Invoke(args);
                     break;
-                case SignalType.Deactivate:
-                    _onDeactivate.Invoke(signal);
+                case DeactivationSignal:
+                    _onDeactivate.Invoke();
                     break;
             }
         }
@@ -30,7 +32,7 @@ namespace ExcellentKit
             DrawGizmosFor(_onDeactivate, "On deactivate");
         }
 
-        private void DrawGizmosFor(SignalUnityEvent unityEvent, string label)
+        private void DrawGizmosFor(UnityEventBase unityEvent, string label)
         {
             for (int idx = 0; idx < unityEvent.GetPersistentEventCount(); idx++)
             {

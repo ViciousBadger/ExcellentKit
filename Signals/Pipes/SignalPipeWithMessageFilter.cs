@@ -1,20 +1,36 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace ExcellentKit
 {
     /// <summary>
-    /// Emits recieved signals if their message matches a given string.
+    /// Emits recieved signals only if their message matches a given string.
     /// </summary>
     public class SignalPipeWithMessageFilter : SignalPipe
     {
         [SerializeField]
         private string _requiredMessage;
 
+        private readonly HashSet<uint> _activeSignals = new();
+
         protected override void OnSignalRecieved(Signal signal)
         {
-            if (signal.Message == _requiredMessage)
+            switch (signal)
             {
-                Emit(signal);
+                case ActivationSignal(uint id, SignalArgs args):
+                    if (args.Message == _requiredMessage)
+                    {
+                        _activeSignals.Add(id);
+                        Emit(signal);
+                    }
+                    break;
+                case DeactivationSignal(uint id):
+                    if (_activeSignals.Contains(id))
+                    {
+                        _activeSignals.Remove(id);
+                        Emit(signal);
+                    }
+                    break;
             }
         }
 

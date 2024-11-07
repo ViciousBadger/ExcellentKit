@@ -13,11 +13,13 @@ namespace ExcellentKit
 
         protected override void OnSignalRecieved(Signal signal)
         {
-            if (signal.Type == SignalType.Activate && signal.IsPlayer(out PlayerActor player))
+            if (
+                signal is ActivationSignal activationSignal
+                && activationSignal.Args.SubjectIsPlayer(out PlayerActor player)
+            )
             {
                 player.Movement.ForceVelocity(GetNewVelocity());
             }
-            // NOTE: We ignore Deactivate, I don't see a reason for handling it atm
         }
 
         private Vector3 GetNewVelocity()

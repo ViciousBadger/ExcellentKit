@@ -13,20 +13,22 @@ namespace ExcellentKit
     /// </summary>
     public class SignalOnVisible : SignalEmitter
     {
+        // There's no real way to differentiate between the "reasons" for a GameObject being visible,
+        // so as a workaround we just use a queue.
         private readonly Queue<uint> _activeSignals = new();
 
         private void OnBecameVisible()
         {
             var newId = SignalId.Next();
             _activeSignals.Enqueue(newId);
-            Emit(new Signal() { Id = newId, Type = SignalType.Activate });
+            Emit(new ActivationSignal(newId, new SignalArgs()));
         }
 
         private void OnBecameInvisible()
         {
             if (_activeSignals.TryDequeue(out uint lastId))
             {
-                Emit(new Signal() { Id = lastId, Type = SignalType.Deactivate });
+                Emit(new DeactivationSignal(lastId));
             }
             else
             {

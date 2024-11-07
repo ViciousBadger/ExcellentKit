@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.ComponentModel;
 using JetBrains.Annotations;
 using UnityEngine;
 
@@ -6,10 +7,7 @@ namespace ExcellentKit
 {
     /// <summary>
     /// <para>
-    /// Emits Deactivate signals when recieving Activate signals and vice versa. Emitted signals will have new IDs.
-    /// </para>
-    /// <para>
-    /// It is ensured that each emitted Activate/Deactivate signal is still correctly "paired".
+    /// Emits Deactivate signals when recieving Activate signals and vice versa. Emitted signals will have new IDs, but the arguments are reused.
     /// </para>
     /// </summary>
     public class SignalPipeWithInversion : SignalPipe
@@ -17,43 +15,44 @@ namespace ExcellentKit
         [SerializeField]
         private bool _activateOnStart = false;
 
-        private readonly Queue<uint> _activeSignals = new();
+        private readonly Queue<uint> _emittedSignalIds = new();
+        private readonly Dictionary<uint, SignalArgs> _activeRecievedSignals = new();
 
         [UsedImplicitly]
         private void Start()
         {
             if (_activateOnStart)
             {
-                Activate(new Signal());
+                var newId = SignalId.Next();
+                _emittedSignalIds.Enqueue(newId);
+                Emit(new ActivationSignal(newId, new()));
             }
         }
 
         protected override void OnSignalRecieved(Signal signal)
         {
-            switch (signal.Type)
+            switch (signal)
             {
-                case SignalType.Activate:
-                    Deactivate(signal);
+                case ActivationSignal(uint id, SignalArgs args):
+                    _activeRecievedSignals.Add(id, args);
+                    if (_emittedSignalIds.Count > 0)
+                    {
+                        var takenId = _emittedSignalIds.Dequeue();
+                        Emit(new DeactivationSignal(takenId));
+                    }
                     break;
-                case SignalType.Deactivate:
-                    Activate(signal);
+                case DeactivationSignal(uint id):
+                    var newId = SignalId.Next();
+                    _emittedSignalIds.Enqueue(newId);
+                    if (_activeRecievedSignals.TryGetValue(id, out SignalArgs storedArgs))
+                    {
+                        Emit(new ActivationSignal(newId, storedArgs));
+                    }
+                    else
+                    {
+                        Emit(new ActivationSignal(newId, new()));
+                    }
                     break;
-            }
-        }
-
-        private void Activate(Signal original)
-        {
-            var newId = SignalId.Next();
-            _activeSignals.Enqueue(newId);
-            Emit(original with { Id = newId, Type = SignalType.Activate });
-        }
-
-        private void Deactivate(Signal original)
-        {
-            if (_activeSignals.Count > 0)
-            {
-                var takenId = _activeSignals.Dequeue();
-                Emit(original with { Id = takenId, Type = SignalType.Deactivate });
             }
         }
 
