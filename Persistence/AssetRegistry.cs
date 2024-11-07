@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,8 +17,11 @@ namespace ExcellentKit
     /// ScriptableObjects are very useful attaching reusable data to
     /// GameObjects, but Unity provides no built-in way to "look up" a certain
     /// ScriptableObject via code, the only way to access them is when a
-    /// reference is saved in the inspector.  To work around this you can use an
-    /// AssetRegistry, simply put it as a serialized field of some globally
+    /// reference is saved in the inspector.
+    /// </para>
+    /// <para>
+    /// To work around this, you can use an
+    /// AssetRegistry - simply put it as a serialized field of some globally
     /// accessable GameObject. Whenever you need a reference to certain
     /// ScriptableObject, use FindIdentifier and save the string you get. You
     /// can then use FindAsset to find the same asset by the identifier string.
@@ -28,16 +33,34 @@ namespace ExcellentKit
         where T : ScriptableObject
     {
         [SerializeField, ListViewSettings(ShowFoldoutHeader = false)]
-        private List<AssetRegistryEntry> _entries;
+        private List<AssetRegistryEntry> _entries = new();
 
-        public T FindAsset(string identifier)
+        public T? FindAsset(string identifier)
         {
-            return _entries.First(e => e.Identifier == identifier).Asset;
+            var entry = _entries.Find(e => e.Identifier == identifier);
+            if (entry != null)
+            {
+                return entry.Asset;
+            }
+            else
+            {
+                Debug.LogWarning("Asset identifier is not in registry: " + identifier);
+                return null;
+            }
         }
 
-        public string FindIdentifier(T asset)
+        public string? FindIdentifier(T asset)
         {
-            return _entries.First(e => e.Asset == asset).Identifier;
+            var entry = _entries.Find(e => e.Asset == asset);
+            if (entry != null)
+            {
+                return entry.Identifier;
+            }
+            else
+            {
+                Debug.LogWarning("Asset is not in registry: " + asset.name);
+                return null;
+            }
         }
 
         [Serializable]
@@ -45,14 +68,13 @@ namespace ExcellentKit
         {
             [SerializeField, HideLabel, AssetsOnly, HorizontalGroup]
             [OnValueChanged("SetDefaultIdentifier")]
-            private T _asset;
+            private T? _asset;
 
-            // TODO: Hash this identifier!
             [SerializeField, HideLabel, HorizontalGroup]
-            private string _identifier;
+            private string _identifier = string.Empty;
 
             public string Identifier => _identifier;
-            public T Asset => _asset;
+            public T? Asset => _asset;
 
             [UsedImplicitly]
             private void SetDefaultIdentifier(T asset)
