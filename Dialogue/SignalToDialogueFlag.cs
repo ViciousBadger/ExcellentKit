@@ -3,13 +3,13 @@ using UnityEngine;
 
 namespace ExcellentKit
 {
-    public class SignalToDialogueFlags : SignalBehaviour
+    public class SignalToDialogueFlag : SignalBehaviour
     {
         [SerializeField]
         private DialogueCharacter _targetCharacter;
 
         [SerializeField]
-        private DialogueFlag _flags;
+        private string _flag;
 
         [SerializeField]
         private DialogueFlagState _newState;
@@ -23,7 +23,7 @@ namespace ExcellentKit
                     : activationSignal.Args.Subject.GetComponent<DialogueCharacter>();
                 if (target)
                 {
-                    target.State.ChangeFlags(_flags, _newState);
+                    target.State.SetFlag(_flag, _newState);
                 }
             }
         }
@@ -35,9 +35,9 @@ namespace ExcellentKit
                 transform.position,
                 string.Format(
                     "Set dialogue flag\n{0}: {1}\nTarget: {2}",
-                    _flags,
+                    _flag,
                     _newState,
-                    _targetCharacter ? _targetCharacter.gameObject.name : "Signal actor"
+                    _targetCharacter ? _targetCharacter.gameObject.name : "Signal subject"
                 )
             );
         }

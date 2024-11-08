@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
-using Alchemy.Inspector;
+using ExcellentGame;
 using MemoryPack;
 using UnityEngine;
 
@@ -10,40 +11,27 @@ namespace ExcellentKit
     [MemoryPackable]
     public partial class DialogueState
     {
-        public DialogueFlag FlagMask { get; private set; } = new();
+        public HashSet<SecretString> Flags { get; private set; } = new();
 
-        public void ChangeFlags(DialogueFlag flag, DialogueFlagState newState)
+        public void SetFlag(string flag, DialogueFlagState newState)
         {
             switch (newState)
             {
                 case DialogueFlagState.Set:
-                    FlagMask |= flag;
+                    Flags.Add(SecretString.Create(flag));
                     break;
                 case DialogueFlagState.Unset:
-                    FlagMask &= ~flag;
+                    Flags.Remove(SecretString.Create(flag));
                     break;
             }
         }
 
-        public DialogueFlagState CheckFlags(DialogueFlag flags)
+        public DialogueFlagState CheckFlag(string flag)
         {
-            return FlagMask.HasFlag(flags) ? DialogueFlagState.Set : DialogueFlagState.Unset;
+            return Flags.Contains(SecretString.Create(flag))
+                ? DialogueFlagState.Set
+                : DialogueFlagState.Unset;
         }
-    }
-
-    [Flags]
-    public enum DialogueFlag
-    {
-        // TODO: Replace with simpler string flags BUT scramble them on save..
-        None = 0b_0000_0000,
-        Alpha = 0b_0000_0001,
-        Beta = 0b_0000_0010,
-        Gamma = 0b_0000_0100,
-        Delta = 0b_0000_1000,
-        Epsilon = 0b_0001_0000,
-        Zeta = 0b_0010_0000,
-        Eta = 0b_0100_0000,
-        Theta = 0b_1000_0000
     }
 
     public enum DialogueFlagState
@@ -56,33 +44,40 @@ namespace ExcellentKit
     public class DialogueStateGuard
     {
         [SerializeField]
-        private DialogueFlag _requiredSetFlags;
+        private string[] _requiredSetFlags;
 
         [SerializeField]
-        private DialogueFlag _requiredUnsetFlags;
+        private string[] _requiredUnsetFlags;
 
         public bool Test(DialogueState stateToCheck)
         {
-            return (
-                    _requiredSetFlags == DialogueFlag.None
-                    || stateToCheck.CheckFlags(_requiredSetFlags) == DialogueFlagState.Set
+            return Array.TrueForAll(
+                    _requiredSetFlags,
+                    setFlag => stateToCheck.CheckFlag(setFlag) == DialogueFlagState.Set
                 )
-                && (
-                    _requiredUnsetFlags == DialogueFlag.None
-                    || stateToCheck.CheckFlags(_requiredUnsetFlags) == DialogueFlagState.Unset
+                && Array.TrueForAll(
+                    _requiredUnsetFlags,
+                    unsetFlag => stateToCheck.CheckFlag(unsetFlag) == DialogueFlagState.Unset
                 );
         }
 
         public override string ToString()
         {
             var str = new StringBuilder();
-            if (_requiredSetFlags != DialogueFlag.None)
+            if (_requiredSetFlags.Length > 0)
             {
-                str.AppendLine(string.Format("Requires {0} to be SET", _requiredSetFlags));
+                str.AppendLine(
+                    string.Format("Requires {0} to be SET", string.Join(", ", _requiredSetFlags))
+                );
             }
-            if (_requiredUnsetFlags != DialogueFlag.None)
+            if (_requiredUnsetFlags.Length > 0)
             {
-                str.AppendLine(string.Format("Requires {0} to be UNSET", _requiredUnsetFlags));
+                str.AppendLine(
+                    string.Format(
+                        "Requires {0} to be UNSET",
+                        string.Join(", ", _requiredUnsetFlags)
+                    )
+                );
             }
             if (str.Length > 0)
             {
@@ -90,19 +85,6 @@ namespace ExcellentKit
             }
             return str.ToString();
         }
-    }
-
-    [Serializable]
-    public class DialogueFlagRequirement
-    {
-        [SerializeField]
-        private DialogueFlag _flag;
-
-        [SerializeField]
-        private DialogueFlagState _requiredState;
-
-        public DialogueFlag Flag => _flag;
-        public DialogueFlagState RequiredState => _requiredState;
     }
 
     [Serializable]
@@ -119,21 +101,15 @@ namespace ExcellentKit
 
         public DialogueEntry Test(DialogueState state)
         {
-            foreach (var alternative in _alternatives)
-            {
-                if (alternative.Guard.Test(state))
-                {
-                    return alternative.Entry;
-                }
-            }
-            return _main;
+            var validAlt = _alternatives.FirstOrDefault(alt => alt.Guard.Test(state));
+            return validAlt != null ? validAlt.Entry : _main;
         }
     }
 
     [Serializable]
     public class AlternateDialogueEntry
     {
-        [SerializeField, Required]
+        [SerializeField]
         private DialogueEntry _entry;
 
         [SerializeField]

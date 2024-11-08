@@ -27,5 +27,16 @@ namespace ExcellentGame
         {
             return new string(ScrambledData.Select(c => (char)(c - 1337)).ToArray());
         }
+
+        public override bool Equals(object obj)
+        {
+            return obj is SecretString secretString
+                && secretString.ScrambledData.Equals(ScrambledData);
+        }
+
+        public override int GetHashCode()
+        {
+            return ScrambledData.GetHashCode();
+        }
     }
 }
