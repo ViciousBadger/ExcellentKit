@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 using MemoryPack;
 using UnityEngine;
-using UnityEngine.InputSystem.EnhancedTouch;
 using UnityEngine.SceneManagement;
 
 namespace ExcellentKit

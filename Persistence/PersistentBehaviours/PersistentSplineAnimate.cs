@@ -1,4 +1,3 @@
-using System.Security.Permissions;
 using MemoryPack;
 using UnityEngine;
 using UnityEngine.Splines;

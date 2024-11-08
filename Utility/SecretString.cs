@@ -2,7 +2,7 @@ using System.Linq;
 using MemoryPack;
 using UnityEngine;
 
-namespace ExcellentGame
+namespace ExcellentKit
 {
     [MemoryPackable]
     public readonly partial struct SecretString
