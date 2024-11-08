@@ -12,7 +12,7 @@ namespace ExcellentKit
         private string _flag;
 
         [SerializeField]
-        private DialogueFlagState _newState;
+        private DialogueFlagState _action;
 
         protected override void OnSignalRecieved(Signal signal)
         {
@@ -23,7 +23,7 @@ namespace ExcellentKit
                     : activationSignal.Args.Subject.GetComponent<DialogueCharacter>();
                 if (target)
                 {
-                    target.State.SetFlag(_flag, _newState);
+                    target.State.SetFlag(_flag, _action);
                 }
             }
         }
@@ -34,9 +34,9 @@ namespace ExcellentKit
             GizmosExtra.DrawLabel(
                 transform.position,
                 string.Format(
-                    "Set dialogue flag\n{0}: {1}\nTarget: {2}",
+                    "{0} dialogue flag {1}\nTarget: {2}",
+                    _action == DialogueFlagState.Set ? "Set" : "Unset",
                     _flag,
-                    _newState,
                     _targetCharacter ? _targetCharacter.gameObject.name : "Signal subject"
                 )
             );
