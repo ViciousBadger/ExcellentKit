@@ -2,7 +2,6 @@
 
 using System;
 using System.Collections.Generic;
-using Alchemy.Inspector;
 using JetBrains.Annotations;
 using UnityEngine;
 
@@ -31,7 +30,7 @@ namespace ExcellentKit
     public class AssetRegistry<T>
         where T : ScriptableObject
     {
-        [SerializeField, ListViewSettings(ShowFoldoutHeader = false)]
+        [SerializeField]
         private List<AssetRegistryEntry> _entries = new();
 
         public T? FindAsset(string identifier)
@@ -65,16 +64,16 @@ namespace ExcellentKit
         [Serializable]
         public class AssetRegistryEntry
         {
-            [SerializeField, HideLabel, AssetsOnly, HorizontalGroup]
-            [OnValueChanged("SetDefaultIdentifier")]
+            [SerializeField]
             private T? _asset;
 
-            [SerializeField, HideLabel, HorizontalGroup]
+            [SerializeField]
             private string _identifier = string.Empty;
 
             public string Identifier => _identifier;
             public T? Asset => _asset;
 
+            // TODO: call in editor class
             [UsedImplicitly]
             private void SetDefaultIdentifier(T asset)
             {
