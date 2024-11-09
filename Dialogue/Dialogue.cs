@@ -8,9 +8,9 @@ using UnityEngine;
 namespace ExcellentKit
 {
     [MemoryPackable]
-    public partial class DialogueState
+    public partial struct DialogueState
     {
-        public HashSet<SecretString> Flags { get; private set; } = new();
+        public HashSet<SecretString> Flags { get; init; }
 
         public void SetFlag(string flag, DialogueFlagState newState)
         {

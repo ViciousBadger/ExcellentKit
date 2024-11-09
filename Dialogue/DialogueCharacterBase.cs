@@ -1,33 +1,29 @@
 using System.Collections.Generic;
-using ExcellentKit;
 using MemoryPack;
 using UnityEditor;
 using UnityEngine;
 
-namespace ExcellentGame
+namespace ExcellentKit
 {
-    public class DialogueCharacter : PersistentBehaviour<DialogueCharacterData>, IPossessable
+    public abstract class DialogueCharacterBase : PersistentBehaviour<DialogueState>, IPossessable
     {
-        private enum DialogueSignalType
+        protected enum DialogueSignalType
         {
             Entry,
             Choice
         }
 
-        private sealed class ActiveDialogueSignal
+        protected sealed class ActiveDialogueSignal
         {
             public uint Id { get; init; }
             public SignalReciever Reciever { get; init; }
         }
 
         [SerializeField]
-        private DialogueView _dialogueViewPrefab;
+        protected NextDialogueEntry _initialEntry;
 
         [SerializeField]
-        private NextDialogueEntry _initialEntry;
-
-        [SerializeField]
-        private DialogueCharacterProfile _characterProfile;
+        protected DialogueCharacterProfile _characterProfile;
 
         [Header("Camera")]
         [SerializeField]
@@ -39,52 +35,13 @@ namespace ExcellentGame
         [SerializeField]
         private float _cameraTargetChangeTime = 1.0f;
 
-        private ExcellentControls.DialogueActions _actions;
-        private DialogueProcess _activeProcess;
-        private readonly Dictionary<DialogueSignalType, ActiveDialogueSignal> _activeSignals =
+        public DialogueState State { get; private set; } = new() { Flags = new() };
+
+        protected DialogueProcess _activeProcess;
+        protected readonly Dictionary<DialogueSignalType, ActiveDialogueSignal> _activeSignals =
             new();
 
-        public DialogueState State { get; private set; } = new();
-
-        protected override void Awake()
-        {
-            base.Awake();
-            _actions = new ExcellentControls().Dialogue;
-            _actions.Exit.performed += (_) => Conciousness.Instance.EndPossession(this);
-        }
-
-        public void OnPossessionStart()
-        {
-            _actions.Enable();
-        }
-
-        public void OnPossessionEnd()
-        {
-            _actions.Disable();
-
-            if (_activeProcess != null)
-            {
-                _activeProcess.Exit();
-                _activeProcess = null;
-            }
-        }
-
-        public float GetCameraFOVModifier()
-        {
-            return _cameraFovModifier;
-        }
-
-        public Vector3 GetCameraPosition()
-        {
-            return _cameraAnchor.position;
-        }
-
-        public Quaternion GetCameraRotation()
-        {
-            return _cameraAnchor.rotation;
-        }
-
-        public void InitiateDialogue()
+        public virtual void InitiateDialogue()
         {
             if (_activeProcess == null)
             {
@@ -101,17 +58,15 @@ namespace ExcellentGame
                     DeactivateExistingSignal(DialogueSignalType.Choice);
                     Conciousness.Instance.EndPossession(this);
                 };
-                var view = Instantiate(_dialogueViewPrefab);
-                view.Init(_characterProfile, _activeProcess);
             }
         }
 
-        private void OnActiveEntryChanged(DialogueEntry newEntry)
+        protected virtual void OnActiveEntryChanged(DialogueEntry newEntry)
         {
             UpdateDialogueSignal(DialogueSignalType.Entry, newEntry);
         }
 
-        private void OnChoiceSelected(DialogueChoice choice)
+        protected virtual void OnChoiceSelected(DialogueChoice choice)
         {
             UpdateDialogueSignal(DialogueSignalType.Choice, choice);
         }
@@ -139,7 +94,47 @@ namespace ExcellentGame
             }
         }
 
-        public void OnDrawGizmos()
+        public virtual void OnPossessionStart()
+        {
+            // Override this to to things like enabling dialogue-related input
+        }
+
+        public virtual void OnPossessionEnd()
+        {
+            if (_activeProcess != null)
+            {
+                _activeProcess.Exit();
+                _activeProcess = null;
+            }
+        }
+
+        public float GetCameraFOVModifier()
+        {
+            return _cameraFovModifier;
+        }
+
+        public Vector3 GetCameraPosition()
+        {
+            return _cameraAnchor.position;
+        }
+
+        public Quaternion GetCameraRotation()
+        {
+            return _cameraAnchor.rotation;
+        }
+
+        protected override DialogueState Persist()
+        {
+            return State;
+        }
+
+        protected override void Apply(DialogueState savedData)
+        {
+            State = savedData;
+        }
+
+        [SerializeField]
+        private void OnDrawGizmos()
         {
             GizmosExtra.ColorPaletteDialogue();
             var name = _characterProfile
@@ -186,21 +181,5 @@ namespace ExcellentGame
 
             Selection.activeGameObject = newEntry;
         }
-
-        protected override DialogueCharacterData Persist()
-        {
-            return new() { State = State };
-        }
-
-        protected override void Apply(DialogueCharacterData savedData)
-        {
-            State = savedData.State;
-        }
-    }
-
-    [MemoryPackable]
-    public readonly partial struct DialogueCharacterData
-    {
-        public DialogueState State { get; init; }
     }
 }

@@ -68,19 +68,6 @@ namespace ExcellentKit
         /// An optional "message" for the signal, useful for filtering out certain signals in complex logic. Defaults to null.
         /// </summary>
         public string? Message { get; init; }
-
-        public bool SubjectIsPlayer(out PlayerActor? player)
-        {
-            if (Subject != null)
-            {
-                return Subject.TryGetComponent(out player);
-            }
-            else
-            {
-                player = null;
-                return false;
-            }
-        }
     }
 
     /// <summary>
