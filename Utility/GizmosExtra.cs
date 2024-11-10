@@ -1,12 +1,9 @@
+using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 namespace ExcellentKit
 {
-    using System.Collections;
-    using System.Collections.Generic;
-    using UnityEditor;
-    using UnityEngine;
-
     [InitializeOnLoad]
     public static class GizmoLabelClearer
     {

@@ -1,4 +1,3 @@
-using ExcellentGame;
 using UnityEngine;
 
 namespace ExcellentKit
@@ -6,7 +5,7 @@ namespace ExcellentKit
     public class SignalToDialogueFlag : SignalBehaviour
     {
         [SerializeField]
-        private DialogueCharacter _targetCharacter;
+        private DialogueCharacterBase _targetCharacter;
 
         [SerializeField]
         private string _flag;
@@ -20,7 +19,7 @@ namespace ExcellentKit
             {
                 var target = _targetCharacter
                     ? _targetCharacter
-                    : activationSignal.Args.Subject.GetComponent<DialogueCharacter>();
+                    : activationSignal.Args.Subject.GetComponent<DialogueCharacterBase>();
                 if (target)
                 {
                     target.State.SetFlag(_flag, _action);
