@@ -41,26 +41,41 @@ namespace ExcellentKit
                 }
             }
         }
+    }
 
-        // TODO: add as inspector button
-        [UsedImplicitly]
-        private void CreateNewChoice()
+    [CustomEditor(typeof(DialogueEntry))]
+    class DialogueEntryEditor : Editor
+    {
+        SerializedProperty _choicesList;
+
+        void OnEnable()
         {
-            var newChoice = new GameObject("Choice");
-            Undo.RegisterCreatedObjectUndo(newChoice, "New dialogue choice");
+            _choicesList = serializedObject.FindProperty("_choices");
+        }
 
-            var component = newChoice.AddComponent<DialogueChoice>();
-            newChoice.transform.SetParent(transform, false);
-            newChoice.transform.localPosition = new Vector3(_choices.Count, 1f, 0);
+        public override void OnInspectorGUI()
+        {
+            DrawDefaultInspector();
+            EditorGUILayout.Separator();
 
-            var serialized = new SerializedObject(this);
-            var choices = serialized.FindProperty("_choices");
-            var idx = choices.arraySize;
-            choices.InsertArrayElementAtIndex(idx);
-            choices.GetArrayElementAtIndex(idx).objectReferenceValue = component;
-            serialized.ApplyModifiedProperties();
+            if (GUILayout.Button("Create new choice"))
+            {
+                var targetComponent = (DialogueEntry)target;
 
-            Selection.activeGameObject = newChoice;
+                var newChoice = new GameObject("Choice");
+                Undo.RegisterCreatedObjectUndo(newChoice, "New dialogue choice");
+
+                var component = newChoice.AddComponent<DialogueChoice>();
+                var idx = _choicesList.arraySize;
+                newChoice.transform.SetParent(targetComponent.transform, false);
+                newChoice.transform.localPosition = new Vector3(idx, 1f, 0);
+
+                _choicesList.InsertArrayElementAtIndex(idx);
+                _choicesList.GetArrayElementAtIndex(idx).objectReferenceValue = component;
+                serializedObject.ApplyModifiedProperties();
+
+                Selection.activeGameObject = newChoice;
+            }
         }
     }
 }

@@ -62,24 +62,42 @@ namespace ExcellentKit
             str.Length--;
             GizmosExtra.DrawLabel(transform.position, str.ToString());
         }
+    }
 
-        // TODO: add as inspector button
-        [UsedImplicitly]
-        private void CreateNextEntry()
+    [CustomEditor(typeof(DialogueChoice))]
+    class DialogueChoiceEditor : Editor
+    {
+        SerializedProperty _nextMainEntry;
+
+        void OnEnable()
         {
-            var newEntry = new GameObject("Entry");
-            Undo.RegisterCreatedObjectUndo(newEntry, "New dialogue entry");
+            _nextMainEntry = serializedObject.FindProperty("_nextEntry._main");
+        }
 
-            var component = newEntry.AddComponent<DialogueEntry>();
-            newEntry.transform.SetParent(transform, false);
-            newEntry.transform.localPosition = new Vector3(0, 1f, 0);
+        public override void OnInspectorGUI()
+        {
+            DrawDefaultInspector();
+            EditorGUILayout.Separator();
 
-            var serialized = new SerializedObject(this);
-            var next = serialized.FindProperty("_nextEntry._main");
-            next.objectReferenceValue = component;
-            serialized.ApplyModifiedProperties();
+            if (
+                _nextMainEntry.objectReferenceValue == null
+                && GUILayout.Button("Create next main entry")
+            )
+            {
+                var targetComponent = (DialogueChoice)target;
 
-            Selection.activeGameObject = newEntry;
+                var newEntry = new GameObject("Entry");
+                Undo.RegisterCreatedObjectUndo(newEntry, "New dialogue entry");
+
+                var component = newEntry.AddComponent<DialogueEntry>();
+                newEntry.transform.SetParent(targetComponent.transform, false);
+                newEntry.transform.localPosition = new Vector3(0, 1f, 0);
+
+                _nextMainEntry.objectReferenceValue = component;
+                serializedObject.ApplyModifiedProperties();
+
+                Selection.activeGameObject = newEntry;
+            }
         }
     }
 }

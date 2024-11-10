@@ -1,11 +1,13 @@
 using System.Collections.Generic;
-using MemoryPack;
 using UnityEditor;
 using UnityEngine;
 
 namespace ExcellentKit
 {
-    public abstract class DialogueCharacterBase : PersistentBehaviour<DialogueState>, IPossessable
+    /// <summary>
+    /// Represents a character you can dialogue with. Only handles the barebones logic of the dialogue system - inherit this class to customize and extend behaviour.
+    /// </summary>
+    public abstract class DialogueCharacterBase : PersistentBehaviour<DialogueState>
     {
         protected enum DialogueSignalType
         {
@@ -22,43 +24,27 @@ namespace ExcellentKit
         [SerializeField]
         protected NextDialogueEntry _initialEntry;
 
-        [SerializeField]
-        protected DialogueCharacterProfile _characterProfile;
-
-        [Header("Camera")]
-        [SerializeField]
-        private Transform _cameraAnchor;
-
-        [SerializeField]
-        private float _cameraFovModifier = 1.0f;
-
-        [SerializeField]
-        private float _cameraTargetChangeTime = 1.0f;
-
         public DialogueState State { get; private set; } = new() { Flags = new() };
 
         protected DialogueProcess _activeProcess;
         protected readonly Dictionary<DialogueSignalType, ActiveDialogueSignal> _activeSignals =
             new();
 
-        public virtual void InitiateDialogue()
+        public void InitiateDialogue()
         {
             if (_activeProcess == null)
             {
-                Conciousness.Instance.Possess(this, _cameraTargetChangeTime);
                 _activeProcess = new DialogueProcess(State, _initialEntry.Test(State));
                 _activeProcess.ActiveEntryChanged += OnActiveEntryChanged;
                 _activeProcess.ChoiceSelected += OnChoiceSelected;
-                _activeProcess.Exited += () =>
-                {
-                    // ActiveProcess must be set to null immediately to avoid recursion!
-                    // (Because OnPossesionEnd will call Exit() in the process otherwise..)
-                    _activeProcess = null;
-                    DeactivateExistingSignal(DialogueSignalType.Entry);
-                    DeactivateExistingSignal(DialogueSignalType.Choice);
-                    Conciousness.Instance.EndPossession(this);
-                };
+                _activeProcess.Exited += OnActiveDialogueProcessExited;
+                OnActiveDialogueProcessStarted();
             }
+        }
+
+        public void ExitDialogue()
+        {
+            _activeProcess?.Exit();
         }
 
         protected virtual void OnActiveEntryChanged(DialogueEntry newEntry)
@@ -69,6 +55,15 @@ namespace ExcellentKit
         protected virtual void OnChoiceSelected(DialogueChoice choice)
         {
             UpdateDialogueSignal(DialogueSignalType.Choice, choice);
+        }
+
+        protected virtual void OnActiveDialogueProcessStarted() { }
+
+        protected virtual void OnActiveDialogueProcessExited()
+        {
+            DeactivateExistingSignal(DialogueSignalType.Entry);
+            DeactivateExistingSignal(DialogueSignalType.Choice);
+            _activeProcess = null;
         }
 
         private void UpdateDialogueSignal(DialogueSignalType type, Component target)
@@ -94,35 +89,6 @@ namespace ExcellentKit
             }
         }
 
-        public virtual void OnPossessionStart()
-        {
-            // Override this to to things like enabling dialogue-related input
-        }
-
-        public virtual void OnPossessionEnd()
-        {
-            if (_activeProcess != null)
-            {
-                _activeProcess.Exit();
-                _activeProcess = null;
-            }
-        }
-
-        public float GetCameraFOVModifier()
-        {
-            return _cameraFovModifier;
-        }
-
-        public Vector3 GetCameraPosition()
-        {
-            return _cameraAnchor.position;
-        }
-
-        public Quaternion GetCameraRotation()
-        {
-            return _cameraAnchor.rotation;
-        }
-
         protected override DialogueState Persist()
         {
             return State;
@@ -137,10 +103,7 @@ namespace ExcellentKit
         private void OnDrawGizmos()
         {
             GizmosExtra.ColorPaletteDialogue();
-            var name = _characterProfile
-                ? _characterProfile.CharacterName
-                : "No character profile set!";
-            GizmosExtra.DrawLabel(transform.position, string.Format("Character\n{0}", name));
+            GizmosExtra.DrawLabel(transform.position, "Dialogue character");
 
             if (_initialEntry.Main)
             {
@@ -163,23 +126,42 @@ namespace ExcellentKit
                 }
             }
         }
+    }
 
-        // TODO: make editor button
-        private void CreateInitialEntry()
+    [CustomEditor(typeof(DialogueCharacterBase))]
+    class DialogueCharacterBaseEditor : Editor
+    {
+        SerializedProperty _initialMainEntry;
+
+        void OnEnable()
         {
-            var newEntry = new GameObject("Entry");
-            Undo.RegisterCreatedObjectUndo(newEntry, "New dialogue entry");
+            _initialMainEntry = serializedObject.FindProperty("_initialEntry._main");
+        }
 
-            var component = newEntry.AddComponent<DialogueEntry>();
-            newEntry.transform.SetParent(transform, false);
-            newEntry.transform.localPosition = new Vector3(0, 1f, 0);
+        public override void OnInspectorGUI()
+        {
+            DrawDefaultInspector();
+            EditorGUILayout.Separator();
 
-            var serialized = new SerializedObject(this);
-            var initial = serialized.FindProperty("_nextEntry._main");
-            initial.objectReferenceValue = component;
-            serialized.ApplyModifiedProperties();
+            if (
+                _initialMainEntry.objectReferenceValue == null
+                && GUILayout.Button("Create initial main entry")
+            )
+            {
+                var targetComponent = (DialogueCharacterBase)target;
 
-            Selection.activeGameObject = newEntry;
+                var newEntry = new GameObject("Entry");
+                Undo.RegisterCreatedObjectUndo(newEntry, "New dialogue entry");
+
+                var component = newEntry.AddComponent<DialogueEntry>();
+                newEntry.transform.SetParent(targetComponent.transform, false);
+                newEntry.transform.localPosition = new Vector3(0, 1f, 0);
+
+                _initialMainEntry.objectReferenceValue = component;
+                serializedObject.ApplyModifiedProperties();
+
+                Selection.activeGameObject = newEntry;
+            }
         }
     }
 }

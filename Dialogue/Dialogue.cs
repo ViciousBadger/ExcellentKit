@@ -43,10 +43,10 @@ namespace ExcellentKit
     public class DialogueStateGuard
     {
         [SerializeField]
-        private string[] _requiredSetFlags;
+        private string[] _requiredSetFlags = new string[0];
 
         [SerializeField]
-        private string[] _requiredUnsetFlags;
+        private string[] _requiredUnsetFlags = new string[0];
 
         public bool Test(DialogueState stateToCheck)
         {

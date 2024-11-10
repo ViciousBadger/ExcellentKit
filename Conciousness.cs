@@ -55,7 +55,7 @@ namespace ExcellentKit
                 float targetFOV = Mathf.Min(
                     172f,
                     // TODO: inject base fov?
-                    activeTarget.GetCameraFOVModifier()
+                    72f * activeTarget.GetCameraFOVModifier()
                 //GameMaster.GlobalState.Settings.BaseFOV * activeTarget.GetCameraFOVModifier()
                 );
                 _cameraComponent.fieldOfView = Mathf.Lerp(_fovOnTargetChange, targetFOV, st);
