@@ -58,7 +58,7 @@ namespace ExcellentKit
             GizmosExtra.ColorPaletteGameplay();
             GizmosExtra.DrawLabel(
                 transform.position,
-                string.Format("Checkpoint\n{0}", _checkpointName)
+                string.Format("Checkpoint\n'{0}'", _checkpointName)
             );
         }
 
