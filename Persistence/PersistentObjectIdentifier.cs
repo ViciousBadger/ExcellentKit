@@ -22,6 +22,24 @@ namespace ExcellentKit
             GizmosExtra.ColorPaletteGameplay();
             GizmosExtra.DrawLabel(transform.position, string.Format("Persistent\n{0}", _idString));
         }
+
+        public static PersistentObjectIdentifier FindByIdHash(Hash128 hashToLookFor)
+        {
+            foreach (
+                var identifier in FindObjectsByType<PersistentObjectIdentifier>(
+                    FindObjectsInactive.Include,
+                    FindObjectsSortMode.None
+                )
+            )
+            {
+                var hashOfId = identifier.ComputeIdHash();
+                if (hashToLookFor == hashOfId)
+                {
+                    return identifier;
+                }
+            }
+            return null;
+        }
     }
 
     [CustomEditor(typeof(PersistentObjectIdentifier))]
