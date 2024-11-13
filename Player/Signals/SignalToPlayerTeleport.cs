@@ -21,7 +21,7 @@ namespace ExcellentKit
                 player.Movement.Teleport(_targetLocation.position);
                 if (_rotatePlayer)
                 {
-                    player.Looking.TargetPitchYaw = new Vector2(
+                    player.Sight.TargetPitchYaw = new Vector2(
                         _targetLocation.rotation.eulerAngles.y,
                         _targetLocation.rotation.eulerAngles.z
                     );

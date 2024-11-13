@@ -7,7 +7,7 @@ namespace ExcellentKit
         public GameObject GameObject { get; }
         public IPlayerInventory Inventory { get; }
         public IPlayerMortality Mortality { get; }
-        public IPlayerLooking Looking { get; }
+        public IPlayerSight Sight { get; }
         public IPlayerMovement Movement { get; }
     }
 
@@ -33,7 +33,7 @@ namespace ExcellentKit
         public float FovScale { get; set; } = 1f;
     }
 
-    public interface IPlayerLooking
+    public interface IPlayerSight
     {
         public Vector2 TargetPitchYaw { get; set; }
         public void LockMouse();
