@@ -75,13 +75,6 @@ namespace ExcellentKit
             if (_isTurnedOn)
             {
                 TurnedOn?.Invoke(CheckpointTurnOnMode.Loaded);
-
-                // TODO: Find player and set current checkpoint..
-                // .. or save current the checkpoint 'id' on the player! (could use its persistent identifier)
-                // if (GameMaster.TryGetPlayer(out PlayerActor player))
-                // {
-                //     player.Mortality.CurrentCheckpoint = this;
-                // }
             }
         }
     }
