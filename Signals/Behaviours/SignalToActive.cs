@@ -22,12 +22,6 @@ namespace ExcellentKit
         [SerializeField]
         private GameObjectActivationAction _onDeactivate = GameObjectActivationAction.Ignore;
 
-        [UsedImplicitly]
-        private bool TargetIsNotSignalLink(GameObject target)
-        {
-            return !target || target.GetComponent<SignalReciever>() == null;
-        }
-
         protected override void OnSignalRecieved(Signal signal)
         {
             switch (signal)

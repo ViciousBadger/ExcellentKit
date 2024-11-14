@@ -4,7 +4,7 @@ using UnityEngine;
 namespace ExcellentKit
 {
     [RequireComponent(typeof(Light))]
-    public class SignalToLightColor : SignalBehaviour
+    public class SignalToLightColor : GatedSignalBehaviour
     {
         [SerializeField]
         private Color _targetColor = Color.white;
@@ -29,20 +29,21 @@ namespace ExcellentKit
             {
                 _activeHandle.Cancel();
             }
+            base.OnSignalRecieved(signal);
+        }
 
-            switch (signal)
-            {
-                case ActivationSignal:
-                    _activeHandle = LMotion
-                        .Create(_originalColor, _targetColor, _changeTime)
-                        .Bind(x => _light.color = x);
-                    break;
-                case DeactivationSignal:
-                    _activeHandle = LMotion
-                        .Create(_targetColor, _originalColor, _changeTime)
-                        .Bind(x => _light.color = x);
-                    break;
-            }
+        protected override void OnActivate(ActivationSignal signal)
+        {
+            _activeHandle = LMotion
+                .Create(_originalColor, _targetColor, _changeTime)
+                .Bind(x => _light.color = x);
+        }
+
+        protected override void OnDeactivate(DeactivationSignal signal)
+        {
+            _activeHandle = LMotion
+                .Create(_targetColor, _originalColor, _changeTime)
+                .Bind(x => _light.color = x);
         }
 
         public void OnDrawGizmos()

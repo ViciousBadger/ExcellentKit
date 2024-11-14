@@ -1,3 +1,5 @@
+using UnityEngine;
+
 namespace ExcellentKit
 {
     /// <summary>
@@ -11,8 +13,12 @@ namespace ExcellentKit
     /// </summary>
     public class SignalPipeWithGate : SignalPipe
     {
-        private uint? _emittedId;
+        [SerializeField]
+        [Tooltip("How many concurrent active signals are required before a new signal is emitted?")]
+        private uint _activationThreshold = 1;
+
         private uint _activationCount;
+        private uint? _emittedId;
 
         protected override string GetLabelTextForTarget(SignalReciever target)
         {
@@ -25,7 +31,7 @@ namespace ExcellentKit
             {
                 case ActivationSignal(_, SignalArgs args):
                     _activationCount += 1;
-                    if (_activationCount == 1)
+                    if (_activationCount == _activationThreshold)
                     {
                         var newId = SignalId.Next();
                         _emittedId = newId;
@@ -36,7 +42,7 @@ namespace ExcellentKit
                     if (_activationCount > 0)
                     {
                         _activationCount -= 1;
-                        if (_activationCount == 0)
+                        if (_activationCount == _activationThreshold - 1)
                         {
                             Emit(new DeactivationSignal((uint)_emittedId));
                             _emittedId = null;

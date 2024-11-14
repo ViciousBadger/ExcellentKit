@@ -115,6 +115,57 @@ namespace ExcellentKit
 
     /// <summary>
     /// <para>
+    /// An extension of SignalBehaviour that will only activate "once"
+    /// when the number of concurrent activations reaches a threshold.
+    /// </para>
+    /// <para>
+    /// Useful when multiple overlapping signals would result in invalid behaviour, such as when changing the color of a light source.
+    /// </para>
+    /// </summary>
+    public abstract class GatedSignalBehaviour : SignalBehaviour
+    {
+        [SerializeField]
+        [Tooltip(
+            "How many concurrent active signals are required before the behaviour is activated?"
+        )]
+        private uint _activationThreshold = 1;
+
+        private uint _activationCount;
+        private uint? _emittedId;
+
+        protected override void OnSignalRecieved(Signal signal)
+        {
+            switch (signal)
+            {
+                case ActivationSignal(_, SignalArgs args):
+                    _activationCount += 1;
+                    if (_activationCount == _activationThreshold)
+                    {
+                        var newId = SignalId.Next();
+                        _emittedId = newId;
+                        OnActivate(new ActivationSignal(newId, args));
+                    }
+                    break;
+                case DeactivationSignal:
+                    if (_activationCount > 0)
+                    {
+                        _activationCount -= 1;
+                        if (_activationCount == _activationThreshold - 1)
+                        {
+                            OnDeactivate(new DeactivationSignal((uint)_emittedId));
+                            _emittedId = null;
+                        }
+                    }
+                    break;
+            }
+        }
+
+        protected abstract void OnActivate(ActivationSignal signal);
+        protected abstract void OnDeactivate(DeactivationSignal signal);
+    }
+
+    /// <summary>
+    /// <para>
     /// Base class for components that can emit signals to one or more signal recievers.
     /// Call Emit() with a new Signal when something should be emitted.
     /// </para>
