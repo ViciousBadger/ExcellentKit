@@ -9,7 +9,7 @@ namespace ExcellentKit
         {
             if (
                 signal is ActivationSignal activationSignal
-                && activationSignal.Args.SubjectIsPlayer(out IPlayer player)
+                && activationSignal.Args.SubjectIsPlayer(out Player player)
             )
             {
                 player.Mortality.Die();

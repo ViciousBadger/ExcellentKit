@@ -12,7 +12,7 @@ namespace ExcellentKit
     /// </para>
     /// </summary>
     [RequireComponent(typeof(Interactable))]
-    public class SignalOnInteract : MultiTrackingSignalEmitter<IPlayer>
+    public class SignalOnInteract : MultiTrackingSignalEmitter<Player>
     {
         private Interactable _interactable;
 
@@ -37,7 +37,7 @@ namespace ExcellentKit
         {
             // We don't expect multiple simultaneous
             // "interactions" by the same actor.
-            ActivateTracked(args.Actor, new() { Subject = args.Actor.GameObject });
+            ActivateTracked(args.Actor, new() { Subject = args.Actor.gameObject });
         }
 
         private void OnInteractionEnd(InteractionArgs args)

@@ -83,12 +83,6 @@ namespace ExcellentKit
                 Handles.BeginGUI();
                 GUI.Label(rect, content, style);
                 Handles.EndGUI();
-
-                //Handles.Label(offsetPosition, text, style);
-
-                // Draw an invisible thingy that makes the object selectable
-                // by clicking the label
-                //Gizmos.DrawIcon(offsetPosition, "Selector.png", false);
             }
         }
 

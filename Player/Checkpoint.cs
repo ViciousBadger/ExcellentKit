@@ -34,7 +34,7 @@ namespace ExcellentKit
         {
             if (!_isTurnedOn)
             {
-                if (args.SubjectIsPlayer(out IPlayer player))
+                if (args.SubjectIsPlayer(out Player player))
                 {
                     player.Mortality.CurrentCheckpoint = this;
                 }

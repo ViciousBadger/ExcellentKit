@@ -2,6 +2,9 @@ using UnityEngine;
 
 namespace ExcellentKit
 {
+    /// <summary>
+    /// A small collection of useful extension methods that argument external types.
+    /// </summary>
     public static class ExtensionMethods
     {
         public static float Remap(this float value, float from1, float to1, float from2, float to2)

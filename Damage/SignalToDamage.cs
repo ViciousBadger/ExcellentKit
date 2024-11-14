@@ -9,21 +9,21 @@ namespace ExcellentKit
         [SerializeField]
         DamageSource _source;
 
-        private readonly Dictionary<uint, IPlayer> _activations = new();
+        private readonly Dictionary<uint, Player> _activations = new();
 
         protected override void OnSignalRecieved(Signal signal)
         {
             switch (signal)
             {
                 case ActivationSignal(uint id, SignalArgs args):
-                    if (args.SubjectIsPlayer(out IPlayer player))
+                    if (args.SubjectIsPlayer(out Player player))
                     {
                         _activations.Add(id, player);
                         player.Mortality.AddDamageSource(_source);
                     }
                     break;
                 case DeactivationSignal(uint id):
-                    if (_activations.TryGetValue(id, out IPlayer hurtingPlayer))
+                    if (_activations.TryGetValue(id, out Player hurtingPlayer))
                     {
                         _activations.Remove(id);
                         hurtingPlayer.Mortality.RemoveDamageSource(_source);

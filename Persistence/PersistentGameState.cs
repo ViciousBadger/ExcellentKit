@@ -40,8 +40,6 @@ namespace ExcellentKit
             SceneStates.Add(sceneIdentifier, state);
 
             AudioListener.pause = wasPaused;
-
-            Debug.Log("Persisted scene");
         }
 
         public void ApplyCurrentScene()

@@ -5,7 +5,7 @@ namespace ExcellentKit
 {
     public abstract class EquippedItem : MonoBehaviour
     {
-        public IPlayer Owner { get; set; }
+        public Player Owner { get; set; }
 
         protected virtual void OnDrawGizmos()
         {

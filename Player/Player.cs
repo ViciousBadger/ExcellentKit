@@ -2,13 +2,15 @@ using UnityEngine;
 
 namespace ExcellentKit
 {
-    public interface IPlayer
+    /// <summary>
+    /// Base class for a "player" component that exposes core player functionality. Since player scripts tend to get very complex, it is good practice to only expose what is expected to be interfaced with by the outside world.
+    /// </summary>
+    public abstract class Player : MonoBehaviour
     {
-        public GameObject GameObject { get; }
-        public IPlayerInventory Inventory { get; }
-        public IPlayerMortality Mortality { get; }
-        public IPlayerSight Sight { get; }
-        public IPlayerMovement Movement { get; }
+        public abstract IPlayerInventory Inventory { get; }
+        public abstract IPlayerMortality Mortality { get; }
+        public abstract IPlayerSight Sight { get; }
+        public abstract IPlayerMovement Movement { get; }
     }
 
     public interface IPlayerInventory

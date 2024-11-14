@@ -12,7 +12,7 @@ namespace ExcellentKit
     /// </para>
     /// </summary>
     [RequireComponent(typeof(Interactable))]
-    public class SignalOnHover : MultiTrackingSignalEmitter<IPlayer>
+    public class SignalOnHover : MultiTrackingSignalEmitter<Player>
     {
         private Interactable _interactable;
 
@@ -37,7 +37,7 @@ namespace ExcellentKit
         {
             // We don't expect multiple simultaneous
             // "hoverings" by the same actor.
-            ActivateTracked(args.Actor, new() { Subject = args.Actor.GameObject });
+            ActivateTracked(args.Actor, new() { Subject = args.Actor.gameObject });
         }
 
         private void OnHoverEnd(HoverArgs args)

@@ -75,6 +75,9 @@ namespace ExcellentKit
             }
         }
 
+        /// <summary>
+        /// Persist the current scene and save all persistent state to the save file.
+        /// </summary>
         public void Save()
         {
             var path = GetSaveGamePath();
@@ -86,6 +89,21 @@ namespace ExcellentKit
             _persistentGameState.SaveToFile(path);
         }
 
+        /// <summary>
+        /// Persist the current scene without saving anything to disk.
+        /// </summary>
+        public void PersistCurrentScene()
+        {
+            if (_enableDebugLogging)
+            {
+                Debug.Log("Persisting current scene");
+            }
+            _persistentGameState.PersistCurrentScene();
+        }
+
+        /// <summary>
+        /// Load persistent state from the save file (if any) and apply it to the current scene.
+        /// </summary>
         public void Load()
         {
             var path = GetSaveGamePath();
@@ -103,6 +121,18 @@ namespace ExcellentKit
             {
                 Debug.Log("No savegame found at " + path);
             }
+        }
+
+        /// <summary>
+        /// Apply the current scene from existing persistent state without loading anything from disk.
+        /// </summary>
+        public void ApplyCurrentScene()
+        {
+            if (_enableDebugLogging)
+            {
+                Debug.Log("Applying current scene");
+            }
+            _persistentGameState.ApplyCurrentScene();
         }
 
         public void DeleteSaveData()
