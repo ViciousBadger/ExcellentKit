@@ -52,12 +52,7 @@ namespace ExcellentKit
                     Quaternion.Slerp(_rotOnTargetChange, activeTarget.GetCameraRotation(), st)
                 );
 
-                float targetFOV = Mathf.Min(
-                    172f,
-                    // TODO: inject base fov?
-                    72f * activeTarget.GetCameraFOVModifier()
-                //GameMaster.GlobalState.Settings.BaseFOV * activeTarget.GetCameraFOVModifier()
-                );
+                float targetFOV = Mathf.Clamp(activeTarget.GetCameraFieldOfView(), 10f, 172f);
                 _cameraComponent.fieldOfView = Mathf.Lerp(_fovOnTargetChange, targetFOV, st);
             }
         }
@@ -118,6 +113,6 @@ namespace ExcellentKit
         public abstract void OnPossessionEnd();
         public abstract Vector3 GetCameraPosition();
         public abstract Quaternion GetCameraRotation();
-        public abstract float GetCameraFOVModifier();
+        public abstract float GetCameraFieldOfView();
     }
 }

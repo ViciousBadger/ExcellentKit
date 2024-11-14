@@ -28,7 +28,7 @@ namespace ExcellentKit
     /// the active Game Master instance.
     /// </para>
     /// </summary>
-    /// <typeparam name="TInstance">The concrete type of the game master. Just set this to the class you're defining.</typeparam>
+    /// <typeparam name="TInstance">The concrete type of the game master. When deriving from GameMasterBase, set this to the class you're defining.</typeparam>
     /// <typeparam name="TGlobalState">A type used for persistent global state.</typeparam>
     public abstract class GameMasterBase<TInstance, TGlobalState> : MonoBehaviour
         where TInstance : GameMasterBase<TInstance, TGlobalState>
