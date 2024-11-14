@@ -152,7 +152,7 @@ namespace ExcellentKit
                         _activationCount -= 1;
                         if (_activationCount == _activationThreshold - 1)
                         {
-                            OnDeactivate(new DeactivationSignal((uint)_emittedId));
+                            OnDeactivate(new DeactivationSignal(_emittedId ?? 0));
                             _emittedId = null;
                         }
                     }
