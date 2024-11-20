@@ -11,43 +11,37 @@ namespace ExcellentKit
         [SerializeField]
         private float _delay = 0;
 
-        private sealed class Pulse
+        private sealed class DelayedSignal
         {
             public float DelayTimer { get; set; }
             public Signal Signal { get; init; }
         }
 
-        private enum PulseType
-        {
-            Activate,
-            Deactivate
-        }
-
-        private readonly List<Pulse> _pulses = new();
+        private readonly List<DelayedSignal> _delayedSignals = new();
 
         private void Update()
         {
-            var pulsesToRemove = new List<Pulse>();
+            var delayedSignalsToRemove = new List<DelayedSignal>();
 
-            foreach (var pulse in _pulses)
+            foreach (var delayedSignal in _delayedSignals)
             {
-                pulse.DelayTimer -= Time.deltaTime;
-                if (pulse.DelayTimer <= 0f)
+                delayedSignal.DelayTimer -= Time.deltaTime;
+                if (delayedSignal.DelayTimer <= 0f)
                 {
-                    pulsesToRemove.Add(pulse);
-                    Emit(pulse.Signal);
+                    delayedSignalsToRemove.Add(delayedSignal);
+                    Emit(delayedSignal.Signal);
                 }
             }
 
-            foreach (var pulse in pulsesToRemove)
+            foreach (var pulse in delayedSignalsToRemove)
             {
-                _pulses.Remove(pulse);
+                _delayedSignals.Remove(pulse);
             }
         }
 
         protected override void OnSignalRecieved(Signal signal)
         {
-            _pulses.Add(new() { DelayTimer = _delay, Signal = signal });
+            _delayedSignals.Add(new() { DelayTimer = _delay, Signal = signal });
         }
 
         protected override string GetLabelTextForTarget(SignalReciever target)
