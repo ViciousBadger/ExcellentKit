@@ -13,11 +13,17 @@ namespace ExcellentKit
         public abstract IPlayerMovement Movement { get; }
     }
 
+    public enum EquipmentAddMode
+    {
+        Silent,
+        PickedUp
+    }
+
     public interface IPlayerInventory
     {
         public Collection Collection { get; }
 
-        public void AddEquipment(Equipable newEquipable, bool pickUp = false);
+        public void AddEquipment(Equipable newEquipable, EquipmentAddMode mode);
     }
 
     public interface IPlayerMortality
