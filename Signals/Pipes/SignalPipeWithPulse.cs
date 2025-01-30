@@ -78,7 +78,7 @@ namespace ExcellentKit
                     }
                     else
                     {
-                        newEmitter.Timer = Random.Range(_minPulseLength, _maxPulseLength);
+                        newEmitter.Timer = Random.Range(_minPulseInterval, _maxPulseInterval);
                     }
                     _activePulses.Add(id, newEmitter);
                     break;

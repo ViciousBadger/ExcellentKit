@@ -82,21 +82,33 @@ namespace ExcellentKit
         /// </summary>
         public void PersistBehaviour(PersistentBehaviour behaviour)
         {
-            var objectState = GetOrCreateObjectState(behaviour.ObjectIdentifier);
-            var behaviourId = behaviour.ComputeIdentifier();
-
-            if (objectState.PersistentBehaviours.ContainsKey(behaviourId))
+            if (behaviour.ObjectIdentifier == null)
             {
-                Debug.LogError(
-                    string.Format(
-                        "Duplicate component save attempted in persistent object {0}.\nDon't add the same PersistentComponent more than once and make sure the object has an unique identifier.",
-                        behaviour.ObjectIdentifier.IdString
-                    )
+                Debug.Log(
+                    "Skipped deserialize, ObjectIdentifier is null in: " + behaviour.gameObject.name
                 );
             }
             else
             {
-                objectState.PersistentBehaviours.Add(behaviourId, behaviour.PersistAndSerialize());
+                var objectState = GetOrCreateObjectState(behaviour.ObjectIdentifier);
+                var behaviourId = behaviour.ComputeIdentifier();
+
+                if (objectState.PersistentBehaviours.ContainsKey(behaviourId))
+                {
+                    Debug.LogError(
+                        string.Format(
+                            "Duplicate component save attempted in persistent object {0}.\nDon't add the same PersistentComponent more than once and make sure the object has an unique identifier.",
+                            behaviour.ObjectIdentifier.IdString
+                        )
+                    );
+                }
+                else
+                {
+                    objectState.PersistentBehaviours.Add(
+                        behaviourId,
+                        behaviour.PersistAndSerialize()
+                    );
+                }
             }
         }
 
@@ -105,15 +117,24 @@ namespace ExcellentKit
         /// </summary>
         public void ApplyBehaviour(PersistentBehaviour behaviour)
         {
-            var objectState = GetOrCreateObjectState(behaviour.ObjectIdentifier);
-            if (
-                objectState.PersistentBehaviours.TryGetValue(
-                    behaviour.ComputeIdentifier(),
-                    out byte[] value
-                )
-            )
+            if (behaviour.ObjectIdentifier == null)
             {
-                behaviour.DeserializeAndApply(value);
+                Debug.Log(
+                    "Skipped deserialize, ObjectIdentifier is null in: " + behaviour.gameObject.name
+                );
+            }
+            else
+            {
+                var objectState = GetOrCreateObjectState(behaviour.ObjectIdentifier);
+                if (
+                    objectState.PersistentBehaviours.TryGetValue(
+                        behaviour.ComputeIdentifier(),
+                        out byte[] value
+                    )
+                )
+                {
+                    behaviour.DeserializeAndApply(value);
+                }
             }
         }
 
